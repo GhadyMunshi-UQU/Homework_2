@@ -60,14 +60,14 @@ public class LibraryBookTracker {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } catch (Exception e) {
-            System.out.println(+e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
     // ------------Methods---------
 
     // يحلل النص و يقسمه ويرجع اوبجكت Book
-    private static Book parseBook(String line) {
+    private static Book parseBook(String line) throws MalformedBookEntryException {
 
         // مصفوفة لاقسام الكتاب
         String[] parts = line.split(":");
@@ -90,12 +90,8 @@ public class LibraryBookTracker {
             throw new MalformedBookEntryException("ISBN must be exactly 13 digits.");
         }
         int copies;
-        try {
-            copies = Integer.parseInt(copiesString);
-            if (copies <= 0) {
-                throw new NumberFormatException("Copies must be a positive integer.");
-            }
-        } catch (NumberFormatException e) {
+        copies = Integer.parseInt(copiesString);
+        if (copies <= 0) {
             throw new MalformedBookEntryException("Copies must be a positive integer.");
         }
 
@@ -142,7 +138,8 @@ public class LibraryBookTracker {
     }
 
     // اضافة كتاب جديد من عند المستخدم
-    private static void addNewBook(List<Book> books, String record, Path catalogPath) {
+    private static void addNewBook(List<Book> books, String record, Path catalogPath)
+            throws MalformedBookEntryException {
 
         Book newBook = parseBook(record);
         books.add(newBook);
@@ -151,7 +148,7 @@ public class LibraryBookTracker {
 
         try (BufferedWriter writer = Files.newBufferedWriter(catalogPath)) {
             for (Book b : books) {
-                writer.write(b.toFileString());
+                writer.write(b.toString());
                 writer.newLine();
             }
         } catch (IOException e) {
